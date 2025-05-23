@@ -40,6 +40,9 @@ COPY . .
 # Install PHP dependencies without dev and optimize autoloader
 RUN composer install --no-dev --optimize-autoloader
 
+# Regenerate autoload files to ensure PSR-4 compliance
+RUN composer dump-autoload -o
+
 # Install Filament 3 compatible with Laravel 11
 RUN composer require filament/filament:"^3.0" --no-interaction --no-scripts
 
@@ -49,8 +52,8 @@ RUN chown -R www-data:www-data storage bootstrap/cache
 # Expose port 80 for Apache
 EXPOSE 80
 
-CMD php artisan config:cache && \
-    php artisan key:generate && \
+CMD php artisan key:generate && \
+    php artisan config:cache && \
     php artisan migrate --force && \
     php artisan db:seed --force && \
     php artisan storage:link && \
