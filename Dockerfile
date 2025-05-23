@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions including PostgreSQL support
+# Install system dependencies and PHP extensions (including PostgreSQL support)
 RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libsodium-dev \
     libpq-dev \
     unzip \
+    git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
@@ -31,30 +32,28 @@ RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /et
 # Install Composer globally
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory to Apache root
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy application files into container
+# Copy all Laravel project files
 COPY . .
 
-# Install PHP dependencies without dev and optimize autoloader
+# Install PHP dependencies first (Filament before full composer install)
+RUN composer require filament/filament:"^3.0" --no-interaction --no-scripts
 RUN composer install --no-dev --optimize-autoloader
 
-# Regenerate autoload files to ensure PSR-4 compliance
+# Regenerate autoload and cache Laravel config
 RUN composer dump-autoload -o
 
-# Install Filament 3 compatible with Laravel 11
-RUN composer require filament/filament:"^3.0" --no-interaction --no-scripts
-
-# Set ownership to www-data user for storage and cache folders
+# Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Expose port 80 for Apache
+# Expose port 80
 EXPOSE 80
 
-CMD php artisan key:generate && \
-    php artisan config:cache && \
-    php artisan migrate --force && \
+# Run Laravel setup commands
+CMD php artisan migrate --force && \
     php artisan db:seed --force && \
+    php artisan config:cache && \
     php artisan storage:link && \
     apache2-foreground
