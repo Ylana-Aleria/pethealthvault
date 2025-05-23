@@ -1,3 +1,5 @@
+<?php
+
 use App\Models\Role;
 
 class RoleSeeder extends Seeder
