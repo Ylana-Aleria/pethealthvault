@@ -9,9 +9,14 @@ class RoleSeeder extends Seeder
 {
     public function run()
     {
-        Role::updateOrCreate(
-            ['name' => 'Admin'], // Match this column
-            ['description' => 'Administrator role'] // Update this if it exists
-        );
+        Role::create([
+            'name' => 'Admin',
+            'description' => 'Administrator role',
+        ]);
+
+        Role::create([
+            'name' => 'Owner',
+            'description' => 'Owner role',
+        ]);
     }
 }
