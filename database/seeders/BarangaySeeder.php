@@ -170,8 +170,7 @@ class BarangaySeeder extends Seeder
         ];
 
         foreach ($barangays as $name) {
-            Barangay::create(['name' => $name]);
+            Barangay::firstOrCreate(['name' => $name]);
         }
     }
 }
-
