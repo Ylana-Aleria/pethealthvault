@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions (including PostgreSQL support)
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
@@ -38,30 +38,36 @@ WORKDIR /var/www/html
 # Copy all Laravel project files
 COPY . .
 
-# Create required storage and cache directories, set permissions
+# Create required storage and cache directories and set permissions
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache && \
     chown -R www-data:www-data storage bootstrap && \
     chmod -R 775 storage bootstrap
 
-# Switch to www-data to safely run Composer and Artisan
+# Switch to www-data user
 USER www-data
 
-# Install Composer dependencies (skip scripts initially)
+# Install dependencies WITHOUT running scripts (skip Debugbar issues)
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Run artisan package discovery
+# Clear old cache and regenerate
+RUN php artisan clear-compiled && \
+    php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan route:clear && \
+    php artisan view:clear && \
+    composer dump-autoload
+
+# Run artisan package discovery (after caches are cleared)
 RUN php artisan package:discover --ansi
 
-# Switch back to root
+# Switch back to root to re-check permissions
 USER root
-
-# Re-apply permissions just in case
 RUN chown -R www-data:www-data storage bootstrap && chmod -R 775 storage bootstrap
 
 # Expose port 80
 EXPOSE 80
 
-# Run Laravel setup commands at container start
+# Laravel setup at container start
 CMD php artisan storage:link && \
     php artisan migrate --force && \
     php artisan db:seed --force && \
