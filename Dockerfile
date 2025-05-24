@@ -38,12 +38,8 @@ WORKDIR /var/www/html
 # Copy all Laravel project files
 COPY . .
 
-# Install PHP dependencies first (Filament before full composer install)
-RUN composer require filament/filament:"^3.0" --no-interaction --no-scripts
+# Install dependencies (assumes filament is in composer.json, otherwise use composer require)
 RUN composer install --no-dev --optimize-autoloader
-
-# Regenerate autoload and cache Laravel config
-RUN composer dump-autoload -o
 
 # Set permissions
 RUN mkdir -p storage/framework/{sessions,views,cache} && \
@@ -53,11 +49,11 @@ RUN mkdir -p storage/framework/{sessions,views,cache} && \
 # Expose port 80
 EXPOSE 80
 
-# Run Laravel setup commands
-CMD php artisan migrate --force && \
+# Run Laravel setup commands after container starts
+CMD php artisan storage:link && \
+    php artisan migrate --force && \
     php artisan db:seed --force && \
     php artisan config:cache && \
     php artisan route:cache && \
-    php artisan view:cache &&\
-    php artisan storage:link && \
+    php artisan view:cache && \
     apache2-foreground
