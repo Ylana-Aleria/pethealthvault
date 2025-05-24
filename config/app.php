@@ -31,10 +31,8 @@ return [
     App\Providers\EventServiceProvider::class,
     App\Providers\RouteServiceProvider::class,
 
-    // Conditionally add Debugbar only in local:
-] + (app()->environment('local') ? [
-    Barryvdh\Debugbar\ServiceProvider::class,
-] : []),
+  
+    ],
 
     /*
     |--------------------------------------------------------------------------
