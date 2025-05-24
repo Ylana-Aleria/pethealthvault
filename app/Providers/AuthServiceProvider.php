@@ -11,12 +11,10 @@ class AuthServiceProvider extends ServiceProvider
     /**
      * Register any authentication / authorization services.
      */
-    public function boot(): void
-    {
-        $this->registerPolicies();
-
-        Gate::define('viewFilament', function ($user) {
-            return $user->role_id === 1;
-        });
-    }
+    public function boot()
+{
+    Gate::define('viewFilament', function ($user) {
+        return $user->role_id === 1;
+    });
+}
 }
