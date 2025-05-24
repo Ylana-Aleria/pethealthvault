@@ -19,5 +19,15 @@ class UserSeeder extends Seeder
                 'role_id' => 1
             ]
         );
+
+        User::updateOrCreate(
+            ['email' => 'foresaverde@gmail.com'], // Unique key
+            [
+                'firstname' => 'Foresa',
+                'lastname' => 'Verde',
+                'password' => Hash::make('foresaverde'), // Change to secure password
+                'role_id' => 2
+            ]
+        );
     }
 }
