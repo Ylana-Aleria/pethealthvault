@@ -46,8 +46,9 @@ RUN composer install --no-dev --optimize-autoloader
 RUN composer dump-autoload -o
 
 # Set permissions
-RUN mkdir -p storage/framework/sessions && \
-    chown -R www-data:www-data storage bootstrap/cache
+RUN mkdir -p storage/framework/{sessions,views,cache} && \
+    chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
 
 # Expose port 80
 EXPOSE 80
