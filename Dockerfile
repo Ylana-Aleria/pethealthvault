@@ -46,7 +46,8 @@ RUN composer install --no-dev --optimize-autoloader
 RUN composer dump-autoload -o
 
 # Set permissions
-RUN chown -R www-data:www-data storage bootstrap/cache
+RUN mkdir -p storage/framework/sessions && \
+    chown -R www-data:www-data storage bootstrap/cache
 
 # Expose port 80
 EXPOSE 80
@@ -55,5 +56,7 @@ EXPOSE 80
 CMD php artisan migrate --force && \
     php artisan db:seed --force && \
     php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache\
     php artisan storage:link && \
     apache2-foreground
