@@ -36,7 +36,8 @@ WORKDIR /var/www/html
 
 # Copy application files into container
 COPY . .
-COPY .env.example .env
+# Only copy if the file exists
+COPY --chown=www-data:www-data .env.example .env || true
 
 # Install PHP dependencies without dev and optimize autoloader
 RUN composer install --no-dev --optimize-autoloader
