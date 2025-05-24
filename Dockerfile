@@ -28,21 +28,21 @@ RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cac
 # Switch to www-data user for safer install
 USER www-data
 
-# Install PHP dependencies without dev dependencies, no scripts to avoid issues
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-
-# Clear and optimize caches
-RUN php artisan clear-compiled \
-    && php artisan config:clear \
-    && php artisan cache:clear \
-    && php artisan route:clear \
-    && php artisan view:clear \
-    && composer dump-autoload \
-    && php artisan package:discover --ansi
+# Install PHP dependencies including Filament
+RUN composer require filament/filament && \
+    composer install --no-dev --optimize-autoloader --no-scripts
 
 # Switch back to root to fix permissions again
 USER root
 RUN chown -R www-data:www-data storage bootstrap && chmod -R 775 storage bootstrap
+
+# Publish filament config and assets (needs to run as www-data)
+USER www-data
+RUN php artisan vendor:publish --tag=filament-config --force
+RUN php artisan filament:install --force
+
+# Switch back to root
+USER root
 
 # Expose Apache port
 EXPOSE 80
