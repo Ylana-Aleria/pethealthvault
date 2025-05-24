@@ -34,6 +34,8 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        app()->environment('local') ? Barryvdh\Debugbar\ServiceProvider::class : null,
     ],
     /*
     |--------------------------------------------------------------------------
