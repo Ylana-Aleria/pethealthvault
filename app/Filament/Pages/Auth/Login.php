@@ -1,17 +1,12 @@
-<?php 
+<?php
 
 namespace App\Filament\Pages\Auth;
-use Filament\Forms\Components\Component;
+
+use Filament\Pages\Auth\Login as BaseLogin;
 use Filament\Forms\Components\TextInput;
 
-class Login extends \Filament\Pages\Auth\Login
+class Login extends BaseLogin
 {
-
-    public function __invoke()
-    {
-        // Logic for handling the login request or displaying the login page
-        return view('auth.login');
-    }
     protected function getForms(): array
     {
         return [
@@ -27,7 +22,7 @@ class Login extends \Filament\Pages\Auth\Login
         ];
     }
 
-    protected function getEmailFormComponent(): Component
+    protected function getEmailFormComponent(): TextInput
     {
         return TextInput::make('email')
             ->label('Email Address')
@@ -46,4 +41,3 @@ class Login extends \Filament\Pages\Auth\Login
         ];
     }
 }
-
