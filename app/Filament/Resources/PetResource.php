@@ -167,6 +167,6 @@ class PetResource extends Resource
     {
         return parent::getEloquentQuery()
             ->select(['PetID', 'UserID', 'Name', 'Species', 'Breed', 'AgeYears', 'AgeMonths', 'Gender', 'Image', 'created_at'])
-            ->with(['user:UserID,firstname,lastname']);
+            ->with(['user:id,firstname,lastname']);
     }
 }
