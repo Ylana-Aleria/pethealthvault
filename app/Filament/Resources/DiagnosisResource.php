@@ -24,7 +24,7 @@ class DiagnosisResource extends Resource
         return $form
             ->schema([
                 Select::make('PetID')
-                    ->relationship('pets', 'Name')
+                    ->relationship('pet', 'Name')
                     ->required()
                     ->searchable(),
 
@@ -46,7 +46,7 @@ class DiagnosisResource extends Resource
                     ->searchable(),
 
                 Select::make('MedicationID')
-                    ->relationship('medications', 'ProductName')
+                    ->relationship('medication', 'ProductName')
                     ->nullable()
                     ->searchable(),
 
@@ -61,7 +61,7 @@ class DiagnosisResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('DiagnosisID')->label('ID')->sortable(),
-                TextColumn::make('pets.Name')->label('Pet Name')->sortable()->searchable(),
+                TextColumn::make('pet.Name')->label('Pet Name')->sortable()->searchable(),
                 TextColumn::make('RecordDate')->sortable(),
                 TextColumn::make('Diagnosis')->sortable()->searchable(),
                 TextColumn::make('medications.ProductName')->label('Medication')->sortable()->searchable(),
@@ -96,6 +96,6 @@ class DiagnosisResource extends Resource
     {
         return parent::getEloquentQuery()
             ->select(['DiagnosisID', 'PetID', 'RecordDate', 'Diagnosis', 'MedicationID', 'Veterinarian', 'created_at'])
-            ->with(['pets:PetID,Name', 'medications:MedicationID,ProductName']);
+            ->with(['pet:PetID,Name', 'medication:MedicationID,ProductName']);
     }
 }
