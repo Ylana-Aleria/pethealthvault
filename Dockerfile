@@ -40,7 +40,8 @@ COPY . .
 COPY --chown=www-data:www-data .env.example .env
 
 # Install PHP dependencies without dev and optimize autoloader
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
 
 # Install Filament 3 compatible with Laravel 11
 RUN composer require filament/filament:"^3.0" --no-interaction --no-scripts
