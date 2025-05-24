@@ -16,6 +16,20 @@ use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
+
+    public function __construct()
+    {
+        // Protect only the routes that need auth
+        $this->middleware('auth')->except([
+            'showLoginForm',
+            'login',
+            'forgotPassword',
+            'forgotPasswordPost',
+            'resetPassword',
+            'resetPasswordPost',
+        ]);
+    }
+    
     public function showLoginForm()
     {
         return view('auth.login');
