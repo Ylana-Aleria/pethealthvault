@@ -1,7 +1,7 @@
 # Use official PHP 8.2 with Apache
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions (PostgreSQL, GD, etc)
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libicu-dev libzip-dev libonig-dev libpng-dev libjpeg-dev libfreetype6-dev libsodium-dev libpq-dev unzip git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -14,44 +14,42 @@ RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /et
 # Install Composer globally
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory to Laravel root
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy Laravel app files
+# Copy Laravel files
 COPY . .
 
-# Create storage directories and set permissions
-RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap \
-    && chmod -R 775 storage bootstrap
+# Set correct permissions before Composer actions
+RUN chown -R www-data:www-data /var/www/html && chmod -R 775 /var/www/html
 
-# Switch to www-data user for safer install
-USER www-data
-
-# Install PHP dependencies including Filament
-RUN composer require filament/filament && \
+# Run as root to install Filament and dependencies
+RUN composer require filament/filament:^3.2 --no-scripts && \
     composer install --no-dev --optimize-autoloader --no-scripts
 
-# Switch back to root to fix permissions again
-USER root
-RUN chown -R www-data:www-data storage bootstrap && chmod -R 775 storage bootstrap
+# Set proper permissions for storage and bootstrap
+RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache && \
+    chown -R www-data:www-data storage bootstrap && \
+    chmod -R 775 storage bootstrap
 
-# Publish filament config and assets (needs to run as www-data)
+# Switch to www-data to run artisan safely
 USER www-data
-RUN php artisan vendor:publish --tag=filament-config --force
-RUN php artisan filament:install --force
 
-# Switch back to root
+# Run artisan commands for Filament
+RUN php artisan vendor:publish --tag=filament-config --force && \
+    php artisan filament:install --force
+
+# Switch back to root to expose port and launch apache
 USER root
 
 # Expose Apache port
 EXPOSE 80
 
-# On container start: link storage, migrate, seed, cache config & routes, start Apache
-CMD php artisan storage:link \
-    && php artisan migrate --force \
-    && php artisan db:seed --force \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache \
-    && apache2-foreground
+# Final CMD to run app
+CMD php artisan storage:link && \
+    php artisan migrate --force && \
+    php artisan db:seed --force && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    apache2-foreground
