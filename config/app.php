@@ -22,21 +22,20 @@ return [
 
 
    'providers' => [
-        /*
-         * Laravel Framework Service Providers...
-         */
-        // Other default providers...
+    // Laravel Framework Service Providers...
+    // Other default providers...
 
-        /*
-         * Application Service Providers...
-         */
-        App\Providers\AppServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
-        App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
+    // Application Service Providers...
+    App\Providers\AppServiceProvider::class,
+    App\Providers\AuthServiceProvider::class,
+    App\Providers\EventServiceProvider::class,
+    App\Providers\RouteServiceProvider::class,
 
-        app()->environment('local') ? Barryvdh\Debugbar\ServiceProvider::class : null,
-    ],
+    // Conditionally add Debugbar only in local:
+] + (app()->environment('local') ? [
+    Barryvdh\Debugbar\ServiceProvider::class,
+] : []),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
