@@ -21,7 +21,20 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
 
-   
+   'providers' => [
+        /*
+         * Laravel Framework Service Providers...
+         */
+        // Other default providers...
+
+        /*
+         * Application Service Providers...
+         */
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,
+        App\Providers\EventServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
+    ],
     /*
     |--------------------------------------------------------------------------
     | Application Environment
