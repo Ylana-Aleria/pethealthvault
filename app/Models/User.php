@@ -71,5 +71,11 @@ class User extends Authenticatable implements HasName, MustVerifyEmail, CanReset
     return trim("{$user->firstname} {$user->lastname}");
     }
 
+    public function canAccessFilament(): bool
+{
+    return $this->role_id === 1;
+}
+
+
     
 }
